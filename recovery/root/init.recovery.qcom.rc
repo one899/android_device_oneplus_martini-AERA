@@ -21,7 +21,7 @@ on fs
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
 
 on post-fs
-    start boot-hal-1-2
+    start vendor.boot-hal-1-1
 
 on property:dev.mnt.blk.firmware=*
     wait /sys/kernel/boot_adsp/boot

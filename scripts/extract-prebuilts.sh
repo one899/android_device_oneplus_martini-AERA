@@ -124,6 +124,11 @@ for f in /vendor/etc/vintf/manifest/*.xml; do
   [ -f "$f" ] && cp -f "$f" "$OUT/vintf/manifest/" 2>/dev/null
 done
 
+echo "== boot HAL（HIDL 1.1，ROM 自带）"
+copy /vendor/bin/hw/android.hardware.boot@1.1-service bin/android.hardware.boot@1.1-service
+copy /vendor/etc/init/android.hardware.boot@1.1-service.rc etc/init/android.hardware.boot@1.1-service.rc
+copy /vendor/etc/vintf/manifest/android.hardware.boot@1.1.xml vintf/manifest/android.hardware.boot@1.1.xml
+
 echo "== 杂项配置"
 copy /vendor/etc/gpfspath_oem_config.xml etc/gpfspath_oem_config.xml
 copy /vendor/etc/task_profiles.json etc/task_profiles.json
