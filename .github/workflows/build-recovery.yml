@@ -249,6 +249,12 @@ jobs:
           cd "$GITHUB_WORKSPACE/aera"
           export ALLOW_MISSING_DEPENDENCIES=true
           export LC_ALL=C
+          # Keep the Go-based soong_build and the C++ jobs inside the runner's
+          # 16G RAM: GOGC=50 roughly halves the Go heap, MALLOC_ARENA_MAX stops
+          # glibc from multiplying per-thread arenas. Without these the hosted
+          # runner is SIGTERMed during soong analysis.
+          export GOGC=50
+          export MALLOC_ARENA_MAX=2
           export TMPDIR="$GITHUB_WORKSPACE/tmp"
           mkdir -p "$TMPDIR"
           jobs="${JOBS_INPUT:-4}"
