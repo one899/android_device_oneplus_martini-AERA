@@ -3,6 +3,10 @@ name: Build AERA Recovery (martini / OnePlus 9RT)
 on:
   workflow_dispatch:
     inputs:
+      kernel_run_id:
+        description: 'Reuse the kernel Image artifact from this run id (empty = build kernel)'
+        required: false
+        default: ''
       kernel_ref:
         description: 'Kernel branch'
         required: false
@@ -29,6 +33,7 @@ env:
 
 jobs:
   kernel:
+    if: inputs.kernel_run_id == ''
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     steps:
@@ -43,7 +48,6 @@ jobs:
           docker-images: true
           swap-storage: true
 
-      # 与 9rt 内核 CI 完全一致：kernel 放 kernel/msm-5.4，modules 提供 vendor/ device/
       - name: Checkout kernel
         uses: actions/checkout@v4
         with:
@@ -121,7 +125,8 @@ jobs:
           if-no-files-found: error
 
   recovery:
-    needs: kernel
+    needs: [kernel]
+    if: always() && !cancelled() && (inputs.kernel_run_id != '' || needs.kernel.result == 'success')
     runs-on: ubuntu-24.04
     timeout-minutes: 340
     steps:
@@ -171,7 +176,7 @@ jobs:
           if [ ! -d .repo ] || [ "${{ inputs.full_sync }}" = "true" ]; then
             repo init -u "$MANIFEST_URL" -b aera-16.0 --depth=1
           fi
-          repo sync -c --depth=1 --force-sync --no-clone-bundle --no-tags -j"$(nproc)" --optimized-fetch
+          repo sync -c --force-sync --no-clone-bundle --no-tags -j"$(nproc)" --optimized-fetch
           du -sh "$AERA_TREE"
           df -h /
 
@@ -187,6 +192,8 @@ jobs:
         with:
           name: kernel-image
           path: ${{ env.AERA_TREE }}/device/oneplus/martini/prebuilt
+          run-id: ${{ inputs.kernel_run_id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify Image
         run: |
