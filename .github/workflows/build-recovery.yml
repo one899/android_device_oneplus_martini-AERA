@@ -190,6 +190,28 @@ jobs:
           rm -rf .repo
           echo "--- after ---"; df -h .
 
+      - name: Apply upstream source fixes
+        run: |
+          set -eux
+          cd "$GITHUB_WORKSPACE/aera"
+          # AERA's partitionmanager.cpp references AID_MEDIA_RW without the
+          # header that declares it (data.cpp / twrp-functions.cpp both include it).
+          f=bootable/recovery/partitionmanager.cpp
+          if [ -f "$f" ] && ! grep -q 'android_filesystem_config.h' "$f"; then
+            sed -i '0,/^#include <fstab\/fstab.h>/s//#include <private\/android_filesystem_config.h>\n#include <fstab\/fstab.h>/' "$f"
+            grep -n 'android_filesystem_config.h' "$f"
+          fi
+          # rclone_prebuilt (a full Go program) and fusermount3 are NAS-only deps,
+          # several GB of build time and disk we do not need for recovery.
+          mk=bootable/recovery/aera_build.mk
+          if [ -f "$mk" ] && grep -q 'rclone_prebuilt' "$mk"; then
+            sed -i '/^[[:space:]]*rclone_prebuilt[[:space:]]*\\$/d' "$mk"
+            sed -i '/^[[:space:]]*fusermount3[[:space:]]*$/d' "$mk"
+            sed -i 's/^\([[:space:]]*dhcptool\)[[:space:]]*\\$/\1/' "$mk"
+            grep -nE 'rclone_prebuilt|fusermount3|dhcptool' "$mk" || true
+          fi
+          df -h .
+
       - name: Install device tree
         run: |
           set -eux
