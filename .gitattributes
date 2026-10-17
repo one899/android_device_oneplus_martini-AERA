@@ -1,0 +1,12 @@
+* text=auto eol=lf
+*.sh  text eol=lf
+*.mk  text eol=lf
+*.rc  text eol=lf
+*.prop text eol=lf
+*.fstab text eol=lf
+*.flags text eol=lf
+*.yml text eol=lf
+*.md  text eol=lf
+*.img binary
+*.bin binary
+*.Image binary
