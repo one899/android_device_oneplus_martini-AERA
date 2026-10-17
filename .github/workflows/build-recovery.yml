@@ -210,8 +210,9 @@ jobs:
 
       - name: Build recovery
         run: |
-          set -eux
+          set -ex
           cd "$AERA_TREE"
+          export LC_ALL=C
           source build/envsetup.sh
           lunch twrp_martini-bp2a-eng
           mka adbd recoveryimage -j"$(nproc)"
