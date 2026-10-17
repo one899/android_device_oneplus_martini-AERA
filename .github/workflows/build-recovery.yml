@@ -23,6 +23,10 @@ env:
   KERNEL_REPO: one899/android_kernel_oneplus_sm8350_9rt_295bpf
   KERNEL_BRANCH: perf/eevdf-optimized
   MANIFEST_URL: https://github.com/AERA-Recovery/android_manifest.git
+  # 需要走代理时，在仓库 Variables 里设 HTTP_PROXY，例如
+  #   http://172.22.64.1:7890   (WSL 里看 Windows 主机: ip route show default)
+  http_proxy: ${{ vars.HTTP_PROXY }}
+  https_proxy: ${{ vars.HTTP_PROXY }}
 
 jobs:
   build:
