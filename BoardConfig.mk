@@ -117,8 +117,8 @@ AERA_FRAMERATE := 60
 
 # Panel: /sys/class/backlight/panel0-backlight (same node as stock recovery)
 AERA_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
-AERA_MAX_BRIGHTNESS := 2047
-AERA_DEFAULT_BRIGHTNESS := 800
+AERA_MAX_BRIGHTNESS := 4095
+AERA_DEFAULT_BRIGHTNESS := 1200
 AERA_NO_SCREEN_BLANK := true
 
 AERA_DEFAULT_LANGUAGE := en
