@@ -79,7 +79,10 @@ jobs:
 
       - name: Fetch kernel Image from kernel CI artifact
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 跨仓库下载 artifact 需要能读内核仓库 Actions 的 token：
+          # 在仓库 Secrets 里加 KERNEL_TOKEN（PAT，带 repo 或 actions:read）。
+          # 未配置时退回 GITHUB_TOKEN（仅当内核仓库是本仓库同一 owner 且公开时可能可用）。
+          GH_TOKEN: ${{ secrets.KERNEL_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           set -eux
           WORK="$RUNNER_TEMP/kernel"
