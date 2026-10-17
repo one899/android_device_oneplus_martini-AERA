@@ -253,10 +253,17 @@ jobs:
           # 16G RAM: GOGC=50 roughly halves the Go heap, MALLOC_ARENA_MAX stops
           # glibc from multiplying per-thread arenas. Without these the hosted
           # runner is SIGTERMed during soong analysis.
-          export GOGC=50
-          export MALLOC_ARENA_MAX=2
           export TMPDIR="$GITHUB_WORKSPACE/tmp"
           mkdir -p "$TMPDIR"
+          # soong_build peaks >14G; a cgroup ceiling makes the Go runtime cap
+          # itself (it reads memory.max, which survives the `env -i` soong uses).
+          CG=/sys/fs/cgroup/aerabuild
+          sudo mkdir -p "$CG" || true
+          echo "+memory" | sudo tee /sys/fs/cgroup/cgroup.subtree_control >/dev/null 2>&1 || true
+          echo 12G | sudo tee "$CG/memory.max" >/dev/null 2>&1 || true
+          echo 8G | sudo tee "$CG/memory.swap.max" >/dev/null 2>&1 || true
+          echo $$ | sudo tee "$CG/cgroup.procs" >/dev/null 2>&1 || true
+          echo "cgroup limit: $(cat "$CG/memory.max" 2>/dev/null)  self: $(cat /proc/self/cgroup)"
           jobs="${JOBS_INPUT:-4}"
           df -h .
           free -m
