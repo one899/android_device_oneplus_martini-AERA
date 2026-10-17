@@ -1,0 +1,28 @@
+
+import /init.recovery.qcom_decrypt.rc
+
+on early-init
+    write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
+
+on init
+    write /sys/class/backlight/panel0-backlight/brightness 800
+
+on fs
+    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+
+    # OPPO/OnePlus partition aliases required by update_engine and some tools
+    symlink /dev/block/bootdevice/by-name/oplusdycnvbk /dev/block/bootdevice/by-name/oplusdycnvbk_a
+    symlink /dev/block/bootdevice/by-name/oplusdycnvbk /dev/block/bootdevice/by-name/oplusdycnvbk_b
+    symlink /dev/block/bootdevice/by-name/spunvm /dev/block/bootdevice/by-name/spunvm_a
+    symlink /dev/block/bootdevice/by-name/spunvm /dev/block/bootdevice/by-name/spunvm_b
+
+    mkdir /firmware
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
+
+on post-fs
+    start boot-hal-1-2
+
+on property:dev.mnt.blk.firmware=*
+    wait /sys/kernel/boot_adsp/boot
+    write /sys/kernel/boot_adsp/boot 1

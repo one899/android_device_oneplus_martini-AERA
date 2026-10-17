@@ -1,0 +1,7 @@
+prebuilt/Image
+prebuilt/bin/
+prebuilt/lib64/
+prebuilt/hw/
+prebuilt/egl/
+prebuilt/firmware/
+prebuilt/*.xml
